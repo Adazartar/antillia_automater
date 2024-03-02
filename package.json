@@ -1,0 +1,18 @@
+{
+  "name": "antillia_automater",
+  "version": "1.0.0",
+  "description": "Antillia online form",
+  "main": "app.js",
+  "type":"module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tom Hargreaves, Adam Mantello",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.9",
+    "express": "^4.18.3",
+    "mysql2": "^3.9.2"
+  }
+}
