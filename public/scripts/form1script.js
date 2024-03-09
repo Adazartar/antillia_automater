@@ -1,10 +1,32 @@
+// When file uploaded to website, push it to the sever. Store a list of current photos in classlist on photodiv
+/* *** Server stores a list of all filenames and if they have been pushed to S3, delete all photos on server at the ???begining of each day??? *** */
 
-console.log("Heyo")
+// When submitting a form, push all current files to the server and update the list of files on server
 
-function generate(){
-    const doc = fetch('http://localhost:3000/report');
-    console.log("Document has been sent");
-    console.log(doc);
+document.getElementById("roomBtn").onclick = function() {
+    generateRoom()
+}
+
+document.getElementById("uploadBtn").onclick = function() {
+    processData()
+}
+
+async function uploadToServer(input, container) {
+    const file = input.files[0]
+    let formData = new FormData()
+    formData.append('image', file)
+    
+    fetch('/uploadToNode', { 
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.filename)
+        container.classList.add(data.filename)
+        console.log(container.classList)
+        return data.filename
+    })
 }
 
 async function saveData(){
@@ -131,7 +153,7 @@ window.onload = fillData()
 async function getData(){
     let data = {
         "job_address": document.getElementById('job_address').value,
-        "outside": await processPhotos(document.querySelector('.photocollection-form')),
+        "outside": Array.from(document.querySelector('.photocollection-form').querySelector('[name=selectedPhotos]').classList),
         "account": document.getElementById('account').value,
         "job_category": document.getElementById('job_category').value,
         "start_time": document.getElementById('start_time').value,
@@ -184,7 +206,7 @@ async function getDataRooms(){
             "actions": getCheckboxes('actions', roomElement),
             "supporting_actions": roomElement.querySelector('.supporting_actions').value,
             "equipment": getCheckboxesAndText('equipment', roomElement),
-            "photos": await processPhotos(roomElement.querySelector('.photocollection')),
+            "photos": Array.from(roomElement.querySelector('.photocollection').querySelector('[name=selectedPhotos]').classList),
         }
         return room
     }))
@@ -657,7 +679,7 @@ function generateRoom(){
         <div class="photocollection">
             <label for="photos">Photos</label>
             <input type="file" accept="image/jpg, image/jpeg" class="photos" multiple>
-            <div class="selectedPhotos"></div>
+            <div name="selectedPhotos" class=""></div>
         </div>
     </div>
     `
@@ -732,155 +754,6 @@ function fillCheckboxesAndText(items, checkbox_parent, doc) {
     }
 }
 
-async function processPhotos(photosDiv) {
-    return new Promise((resolve, reject) => {
-        const existingImages = photosDiv.querySelectorAll('.selectedPhotos img');
-        const base64Array = [];
-        let processedCount = 0;
-
-        if (existingImages.length === 0) {
-            // If no images, resolve with an empty array
-            resolve(base64Array);
-        }
-
-        existingImages.forEach((imgElement, index) => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Create a new Image object to load the image
-            const img = new Image();
-
-            // Set up an event listener to handle image load
-            img.onload = function () {
-                // Set canvas dimensions to the image dimensions
-                canvas.width = img.width;
-                canvas.height = img.height;
-
-                // Draw the image onto the canvas
-                ctx.drawImage(img, 0, 0, img.width, img.height);
-
-                // Get the base64-encoded data URL
-                const base64Data = canvas.toDataURL('image/jpeg');
-                base64Array.push(base64Data);
-
-                // Check if this is the last image
-                processedCount++;
-                if (processedCount === existingImages.length) {
-                    resolve(base64Array);
-                }
-            };
-
-            // Set up an event listener to handle image load errors
-            img.onerror = function () {
-                reject(new Error('Error loading image.'));
-            };
-
-            // Set the src attribute to start loading the image
-            img.src = imgElement.src;
-        });
-    });
-}
-
-function processEmail() {
-    const messageContainer = document.createElement('div');
-    messageContainer.textContent = "Sending email please wait"
-    document.getElementById('form').appendChild(messageContainer);
-
-    getData().then((data) => {
-        // Create an array of Promises for generating zip files
-        
-        const zipPromises = [];
-
-        // Generate promises for zip files for each room
-        data.rooms.forEach((room) => {
-            const zip = new JSZip();
-            room.photos.forEach((imageData, j) => {
-                zip.file(`image${j + 1}.jpg`, imageData.split(",")[1], { base64: true });
-            });
-
-            // Generate the zip content and push the promise to the array
-            zipPromises.push(zip.generateAsync({ type: "base64" }));
-        });
-
-        // Add outside.jpg to the zip
-        if(data.outside.length !== 0){
-            const zip = new JSZip();
-            zip.file(`outside.jpg`, data.outside[0].split(",")[1], { base64: true });
-            zipPromises.push(zip.generateAsync({ type: "base64" }));
-        }
-
-        // Wait for all zip files to be generated
-        Promise.all(zipPromises)
-            .then(zipContents => {
-                // Attachments array for Email.send
-                let attachments = zipContents.map((zipBase64, i) => {
-                    const roomName = data.rooms[i] ? data.rooms[i].room_name : "outside";
-                    return {
-                        name: `${roomName}.zip`, // Assuming you want the zip file named after the room_name
-                        data: zipBase64,
-                        encoding: "base64"
-                    };
-                });
-
-                
-                // Send the email with SMTP.js
-                Email.send({
-                    SecureToken: "6bf2cac1-8cf6-4800-ba16-7ab9fece4418",
-                    To: 'admin@antilliaemergencynetwork.com.au',
-                    //To: 'therealadazartar@gmail.com',
-                    From: "adamautomated39@gmail.com",
-                    Subject: `${data.job_address}`,
-                    Body: `
-Job Address: ${data.job_address}<br>
-Account: ${data.account}<br>
-Job Category: ${data.job_category}<br>
-Start Time: ${data.start_time}<br>
-Number of Resources: ${data.num_resources}<br>
-Date Damage Occurred: ${data.date_damage}<br>
-Cause of Damage: ${data.cause_dmg}<br>
-Attendence Number: ${data.attendence_num}<br>
-Client Discussion: ${data.client_discussion}<br>
-Water Damage Class: ${data.water_damage_class}<br>
-Water Damage Category: ${data.water_damage_category}<br>
-Outdoor Temperature: ${data.outdoor_temperature}<br>
-Outdoor Relative Humidity: ${data.outdoor_relative_humidity}<br>
-Outdoor Dew Point: ${data.outdoor_dew_point}<br>
-Outdoor GPK: ${data.outdoor_gpk}<br>
------------------------------------------------------------------------------------------<br>
-${generateRoomText(data.rooms)}
-Other equipment left on site: ${data.other_equipment}<br>
-Next Steps: ${data.next_steps}<br>
-Next Steps Comments: ${data.next_steps_typing}<br>
-Other Trades: ${data.other_trades}<br>
-Other Trades Comments: ${data.other_trades_typing}<br>
-Matters for Consideration: ${data.matters_for_consideration}<br>
-Accomodation: ${data.accomodation}<br>
-Estimated Equipment Pickup: ${data.estimated_equipment_pickup}<br>
-End Time: ${data.end_time}<br><br>
-
-Total Time: ${calculateTimeDifference(data.start_time, data.end_time)}<br>
-Equipment Total: <br>${sumEquipment(data.rooms)}
-
-                    `,
-                    Attachments: attachments
-                }).then(
-                    message => {
-                        if(message === 'OK'){
-                            messageContainer.textContent = "Email sent successfully!";
-                            localStorage.removeItem("userDataForm1")
-
-                            
-                        }
-                        else{
-                            messageContainer.textContent = "Email failed try again later"
-                        }
-                    }
-                );
-            })
-            .catch(error => console.error(error));
-    })
-}
-
 function generateRoomText(data){
     let text = ""
     for(let i = 0; i < data.length; i++){
@@ -910,14 +783,16 @@ Equipment: ${data[i].equipment}<br>
     return text
 }
 
-function handleFileSelect(event, newWidth = 800, newHeight = 640) {
+async function handleFileSelect(event, newWidth = 800, newHeight = 640) {
     const fileInput = event.target;
     const photoDiv = fileInput.closest('.photocollection') || fileInput.closest('.photocollection-form');
-    const photoContainer = photoDiv.querySelector('.selectedPhotos');
+    const photoContainer = photoDiv.querySelector('[name="selectedPhotos"]')
+    console.log(photoContainer)
+    const fileName = await uploadToServer(fileInput, photoContainer)
 
     // Display selected photos for the specific item
     for (const file of fileInput.files) {
-        const photoElement = document.createElement('div');
+        const photoElement = document.createElement('div');        
 
         // Display the image name
         const fileNameElement = document.createElement('div');
@@ -964,6 +839,7 @@ function handleFileSelect(event, newWidth = 800, newHeight = 640) {
         removeButton.addEventListener('click', () => {
             // Remove the associated photo when the button is clicked
             photoElement.remove();
+            photoContainer.classList.remove(fileName)
 
             // Remove the corresponding file from the file input
             const newFiles = Array.from(fileInput.files).filter(f => f !== file);
@@ -1131,4 +1007,18 @@ function sumEquipment(rooms){
     }
 
     return str
+}
+
+async function processData() {
+    let formData = await getData()
+
+    fetch('/form1/submit', {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData),
+    }).then((res) => {
+        window.location.href = '/'
+    })
 }

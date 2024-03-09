@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antillia Automater</title>
     <link rel="icon" href="/images/logo.ico" type="image/x-icon">
-    <link rel="stylesheet" href="/styles/form2styles.css">
+    <link rel="stylesheet" href="/styles/form1styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
-    <script defer src="/scripts/form1script.js"></script>
+    <script defer type="module" src="/scripts/form1script.js"></script>
 </head>
 <body>
     <!--<button onclick=test()>Test</button> -->
@@ -21,8 +21,8 @@
 
         <div class="photocollection-form">
             <label for="outside">Front Elevation Image</label>
-            <input type="file" accept="image/jpg, image/jpeg" class="photos">
-            <div class="selectedPhotos"></div>
+            <input id="photoInput" type="file" accept="image/jpg, image/jpeg" class="photos">
+            <div name="selectedPhotos" class=""></div>
         </div>
 
         <div>
@@ -128,7 +128,7 @@
 
         <div id="rooms"></div>
 
-        <button onclick=generateRoom()>Add Room</button>
+        <button id="roomBtn">Add Room</button>
         <br>
         <br>
         <div>
@@ -188,7 +188,7 @@
 
         <button id="saveButton" onclick=saveData()>Save Data</button>
         <!-- <button onclick=fillData()>Fill Data</button> -->
-        <button onclick=processEmail()>Send Email</button>
+        <button id="uploadBtn" onclick=processData()>Upload</button>
         <br>
         <br>
         
