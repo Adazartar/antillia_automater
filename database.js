@@ -29,8 +29,9 @@ export async function submit_to_database(form_name, file) {
       console.log("Pinged")
       */
     
-    } finally {
-      //await client.close()
-      console.log('Inserted into Database')
+    } catch {
+      console.log("Error uploading to Database")
+      return
     }
+    console.log("Inserted into Database")
 }

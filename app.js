@@ -56,6 +56,28 @@ app.get('/form2', (req, res) => {
     res.render("form2.ejs")
 })
 
+app.post('/form2/submit', async (req, res) => {
+    //Add json to database
+    await submit_to_database('form2', req.body)
+
+    //upload photos to S3
+    for(const photoName of req.body.outside) {
+        await uploadPhoto(photoName)
+    }
+    for(const room of req.body.rooms) {
+        for(const photoName of room.photos) {
+            await uploadPhoto(photoName)
+        }
+    }
+    for(const room of req.body.existing_rooms) {
+        for(const photoName of room.photos) {
+            await uploadPhoto(photoName)
+        }
+    }
+    //Return status to allow a redirect to occur on the fetch call
+    res.sendStatus(201)
+})
+
 app.get('/scope', (req, res) => {
     res.render("scope.ejs")
 })

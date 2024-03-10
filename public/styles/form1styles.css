@@ -11,7 +11,6 @@ div {
 
 label {
     display: block;
-    margin-bottom: 5px;
 }
 
 textarea {
@@ -43,7 +42,6 @@ select {
 
 .checkbox-group input[type="checkbox"] {
     display: inline-block;
-    margin-top: 5px;
 }
 
 button {
@@ -53,7 +51,6 @@ button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-top: 10px;
 }
 
 button:hover {
@@ -80,11 +77,7 @@ button:hover {
     display: none
 }
 
-.dropdown-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
+
 
 .checkbox-group {
     position: relative; /* Add relative positioning to the container */
@@ -103,4 +96,19 @@ button:hover {
 
 .checkbox-pair {
     display: flex;
+}
+
+.checkbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+.left {
+    order: 0;
+}
+
+.right {
+    order: 1;
 }

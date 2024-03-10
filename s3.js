@@ -63,8 +63,16 @@ export async function uploadPhoto(photoName) {
                 console.log('Can\'t upload photo to S3:', err)
                 return;
             }
-            console.log('Successfully uploaded photo to S3')
             console.log("https://antillia-forms.s3.ap-southeast-2.amazonaws.com/" + photoName)
+
+            fs.unlink(`./public/uploads/${photoName}`, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                    return;
+                }
+                console.log('File deleted successfully');
+            });
+
         })
     })
 }
