@@ -62,7 +62,7 @@ function fillData(){
         document.getElementById('num_resources').value = parsedData.num_resources
         document.getElementById('date_damage').value = parsedData.date_damage
         document.getElementById('cause_dmg').value = parsedData.cause_dmg
-        document.getElementById('attendence_num').value = parsedData.attendence_num
+        document.getElementById('attendance_num').value = parsedData.attendance_num
         document.getElementById('client_discussion').value = parsedData.client_discussion
         document.getElementById('water_damage_class').value = parsedData.water_damage_class
         document.getElementById('water_damage_category').value = parsedData.water_damage_category
@@ -150,7 +150,7 @@ async function getData(){
         "num_resources": document.getElementById('num_resources').value,
         "date_damage": document.getElementById('date_damage').value,
         "cause_dmg": document.getElementById('cause_dmg').value,
-        "attendence_num": document.getElementById('attendence_num').value,
+        "attendance_num": document.getElementById('attendance_num').value,
         "client_discussion": document.getElementById('client_discussion').value,
         "water_damage_class": document.getElementById('water_damage_class').value,
         "water_damage_category": document.getElementById('water_damage_category').value,
@@ -175,6 +175,7 @@ async function getData(){
 
 async function getDataRooms(){
     let roomElements = Array.from(document.getElementById("rooms").children)
+    roomElements = roomElements.filter(element => element.innerHTML.trim() !== '')
     return Promise.all(roomElements.map(async (roomElement) => {
         let room = {
             "room_name": roomElement.querySelector('.room_name').value,
@@ -996,7 +997,7 @@ async function processData() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
     }).then((res) => {
         window.location.href = '/'
     })

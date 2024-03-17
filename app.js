@@ -2,7 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import bodyParser from 'body-parser'
 
-import { submit_to_database } from './database.js'
+import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm } from './database.js'
 import { createNewFileName, uploadPhoto } from './s3.js'
 
 const app = express()
@@ -23,13 +23,63 @@ app.use((err, req, res, next) => {
     res.status(500).send("Something broke!")
 })
 
-app.post('/uploadToNode', upload.single('image'), function(req, res) {
+app.get('/', (req, res) => {
+    res.render("index.ejs")
+})
+
+app.post('/uploadToNode', upload.single('image'), (req, res) => {
     //console.log(req.file.filename)
     res.json({ 'filename': req.file.filename })
 })
 
-app.get('/', (req, res) => {
-    res.render("index.ejs")
+app.get('/admin', (req, res) => {
+    res.render("admin.ejs")
+})
+
+app.get('/admin/getWorkers', async (req, res) => {
+    res.json({ 'names': await getWorkers() })
+})
+
+app.get('/admin/create_work_order', (req, res) => {
+    res.render("create_work_order.ejs")
+})
+
+app.post('/admin/create_work_order/new-entry', async (req, res) => {
+    await submit_to_database('forms', {"workOrderNumber": req.body.workOrderNumber,
+                                            "address": req.body.address,
+                                            "attendance_num": req.body.attendance_num})
+    await submit_to_database('jobs', { "workOrderNumber": req.body.workOrderNumber, "worker": req.body.worker})
+    res.sendStatus(200)
+})
+
+app.post('/admin/get_form', async (req, res) => {
+    const form = await getForm(req.body.workOrderNumber)
+    res.json(form)
+})
+
+app.get('/admin/workOrderNumber', async (req, res) => {
+    res.json({ 'workOrderNumber': await getNewWorkOrderNumber()})
+})
+
+app.get('/admin/jobs_submitted', (req, res) => {
+    res.render("jobs_submitted.ejs")
+})
+
+app.get('/admin/create_purchase_order', (req, res) => {
+    res.render("create_purchase_order.ejs")
+})
+
+app.get('/admin/completed_jobs', (req, res) => {
+    res.render("completed_jobs.ejs")
+})
+
+app.get('/admin/create_worker', (req, res) => {
+    res.render("create_worker.ejs")
+})
+
+app.post('/admin/create_worker_id', async (req, res) => {
+    await createWorker(req.body.name)
+    res.sendStatus(200)
 })
 
 app.get('/form1', (req, res) => {
@@ -38,7 +88,7 @@ app.get('/form1', (req, res) => {
 
 app.post('/form1/submit', async (req, res) => {
     //Add json to database
-    await submit_to_database('form1', req.body)
+    await submit_to_database('forms', req.body)
 
     //upload photos to S3
     for(const photoName of req.body.outside) {
@@ -49,7 +99,7 @@ app.post('/form1/submit', async (req, res) => {
             await uploadPhoto(photoName)
         }
     }
-    res.sendStatus(201)
+    res.sendStatus(200)
 })
 
 app.get('/form2', (req, res) => {
@@ -58,7 +108,7 @@ app.get('/form2', (req, res) => {
 
 app.post('/form2/submit', async (req, res) => {
     //Add json to database
-    await submit_to_database('form2', req.body)
+    await submit_to_database('forms', req.body)
 
     //upload photos to S3
     for(const photoName of req.body.outside) {
@@ -75,7 +125,7 @@ app.post('/form2/submit', async (req, res) => {
         }
     }
     //Return status to allow a redirect to occur on the fetch call
-    res.sendStatus(201)
+    res.sendStatus(200)
 })
 
 app.get('/scope', (req, res) => {
