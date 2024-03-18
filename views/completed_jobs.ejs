@@ -7,15 +7,22 @@
     <title>Antillia Automater</title>
     <link rel="stylesheet" href="/styles/admin.css">
     <script defer type="module" src="/scripts/sidebar.js"></script>
+    <script defer type="module" src="/scripts/header.js"></script>
+    <script defer type="module" src="/scripts/completed_jobs.js"></script>
 </head>
 <body>
     <div class="container">
-        <header>
-            <img src="/images/logo_e4f9f5.png" alt="Antillia Emergency Network Logo" id="logo" width=100>
-            <h1>Antillia Emergency Network</h1>
-        </header>
+        <header-component class="header"></header-component>
 
         <sidebar-component id="sidebar"></sidebar-component>
+
+        <div class="main">
+            <div class="form">
+                <ul id="completed">
+                    
+                </ul>
+            </div>
+        </div>
     </div>
 
 </body>

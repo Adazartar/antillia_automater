@@ -3,7 +3,7 @@ const selectForm = document.getElementById("form-selector")
 selectForm.addEventListener("change", setForm)
 
 function setForm() {
-    if(form.querySelector('#newForm')) {
+    while(form.children.length > 1) {
         form.removeChild(form.lastElementChild)
     }
     
@@ -20,6 +20,7 @@ function setForm() {
 function createForm1() {
     let div = document.createElement('div')
     div.id = 'newForm'
+    div.classList.add('form1')
     div.innerHTML = `
     <div class="input">
         <p>Work Order Number:</p>
@@ -50,6 +51,7 @@ function createForm1() {
 function createForm2() {
     let div = document.createElement('div')
     div.id = 'newForm'
+    div.classList.add('form2')
     div.innerHTML = `
     <div id="orderSelector">
         <label for="WON">Work Order Number:</label>
@@ -96,9 +98,16 @@ function getForm(id) {
         body: JSON.stringify({ "workOrderNumber": id })
     }).then(response => response.json())
     .then(data => {
-        document.getElementById('hiddenForm').hidden = ""
-        document.getElementById('address').value = data.address;
-        document.getElementById('attendance_num').innerText = data.attendance_num + 1;
+        if(data) {
+            document.getElementById('hiddenForm').hidden = ""
+            document.getElementById('address').value = data.address;
+            document.getElementById('attendance_num').innerText = data.attendance_num + 1;
+        } else {
+            let div = document.createElement('p')
+            div.innerText = "No form found"
+            form.appendChild(div)
+        }
+        
     })
 }
 
@@ -145,12 +154,13 @@ function createEntry() {
         return
     }
 
-    let data = { "workOrderNumber": 0, "address": document.getElementById('address').value, "worker": document.getElementById('assignWorker').value }
+    const newForm = document.getElementById('newForm')
+    let data = { "workOrderNumber":0, "attendance_num":0, "completed":false, "submitted":false, "address":document.getElementById('address').value, "worker":document.getElementById('assignWorker').value }
 
-    if(!document.getElementById("attendance_num")) {
+    if(newForm.classList.contains('form1')) {
         data.workOrderNumber = parseInt(document.getElementById('WON').innerText)
         data.attendance_num = 1
-    } else {
+    } else if(newForm.classList.contains('form2')) {
         data.workOrderNumber = parseInt(document.getElementById('WON').value)
         data.attendance_num = parseInt(document.getElementById("attendance_num").innerText)
     }

@@ -2,7 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import bodyParser from 'body-parser'
 
-import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm } from './database.js'
+import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm, getSubmittedForms, getCompletedForms } from './database.js'
 import { createNewFileName, uploadPhoto } from './s3.js'
 
 const app = express()
@@ -46,8 +46,10 @@ app.get('/admin/create_work_order', (req, res) => {
 
 app.post('/admin/create_work_order/new-entry', async (req, res) => {
     await submit_to_database('forms', {"workOrderNumber": req.body.workOrderNumber,
-                                            "address": req.body.address,
-                                            "attendance_num": req.body.attendance_num})
+                                        "completed": req.body.completed,
+                                        "submitted": req.body.submitted,
+                                        "address": req.body.address,
+                                        "attendance_num": req.body.attendance_num})
     await submit_to_database('jobs', { "workOrderNumber": req.body.workOrderNumber, "worker": req.body.worker})
     res.sendStatus(200)
 })
@@ -61,8 +63,13 @@ app.get('/admin/workOrderNumber', async (req, res) => {
     res.json({ 'workOrderNumber': await getNewWorkOrderNumber()})
 })
 
-app.get('/admin/jobs_submitted', (req, res) => {
-    res.render("jobs_submitted.ejs")
+app.get('/admin/submitted_jobs', (req, res) => {
+    res.render("submitted_jobs.ejs")
+})
+
+app.get('/admin/submitted_jobs/get_forms', async (req, res) => {
+    const forms = await getSubmittedForms()
+    res.json(forms)
 })
 
 app.get('/admin/create_purchase_order', (req, res) => {
@@ -71,6 +78,11 @@ app.get('/admin/create_purchase_order', (req, res) => {
 
 app.get('/admin/completed_jobs', (req, res) => {
     res.render("completed_jobs.ejs")
+})
+
+app.get('/admin/completed_jobs/get_forms', async (req, res) => {
+    const forms = await getCompletedForms()
+    res.json(forms)
 })
 
 app.get('/admin/create_worker', (req, res) => {

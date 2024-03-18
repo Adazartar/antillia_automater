@@ -15,7 +15,7 @@ body {
     height: 100vh;
 }
 
-header {
+.header {
     grid-row: 1;
     grid-column-start: 1;
     grid-column-end: 3;
@@ -26,6 +26,12 @@ header {
     background-color: #e4f9f5;
     height: 100px;
     padding: 1px;
+}
+
+#headerBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar {

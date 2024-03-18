@@ -6,6 +6,8 @@ dotenv.config()
 
 const uri = "mongodb+srv://" + process.env.MONGODB_USERNAME + ":" + process.env.MONGODB_PASSWORD + "@aenforms.a9lg4ty.mongodb.net/?retryWrites=true&w=majority&appName=AENForms"
 
+const dbName = "AENForms"
+
 const client = new MongoClient(uri, {
     serverApi: {
       version: ServerApiVersion.v1,
@@ -15,7 +17,6 @@ const client = new MongoClient(uri, {
 });
 
 export async function submit_to_database(form_name, file) {
-  const dbName = "AENForms";
   const collectionName = form_name;
 
   try {
@@ -37,7 +38,6 @@ export async function submit_to_database(form_name, file) {
 }
 
 export async function getNewWorkOrderNumber() {
-  const dbName = "AENForms"
   const collectionName = "forms"
 
   try {
@@ -58,7 +58,6 @@ export async function getNewWorkOrderNumber() {
 }
 
 export async function getWorkers() {
-  const dbName = "AENForms"
   const collectionName = "staff"
 
   try {
@@ -79,7 +78,6 @@ export async function getWorkers() {
 }
 
 export async function createWorker(name) {
-  const dbName = "AENForms"
   const collectionName = "staff"
 
   try {
@@ -102,8 +100,7 @@ export async function createWorker(name) {
   }
 }
 
-export async function getForm(workOrderNumber) {
-  const dbName = "AENForms"
+export async function getForm(WON) {
   const collectionName = "forms"
   
   try {
@@ -111,7 +108,7 @@ export async function getForm(workOrderNumber) {
 
     const database = client.db(dbName)
     const collection = database.collection(collectionName)
-    const form = await collection.find({}, { 'workOrderNumber': workOrderNumber }).sort({ "attendance_num": -1 }).toArray()
+    const form = await collection.find({ "workOrderNumber": parseInt(WON)}).sort( { 'attendance_num': -1 }).toArray()
 
     if(form.length > 0) {
       return form[0]
@@ -120,5 +117,47 @@ export async function getForm(workOrderNumber) {
     }
   } catch {
     console.log("Error getting form")
+  }
+}
+
+export async function getSubmittedForms() {
+  const collectionName = "forms"
+
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection(collectionName)
+    const forms = await collection.find({"submitted": true}).toArray()
+
+    if(forms.length > 0) {
+      return forms
+    } else {
+      return null
+    }
+
+  } catch {
+    console.log("Error getting submitted forms")
+  }
+}
+
+export async function getCompletedForms() {
+  const collectionName = "forms"
+
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection(collectionName)
+    const forms = await collection.find({"completed": true}).toArray()
+
+    if(forms.length > 0) {
+      return forms
+    } else {
+      return null
+    }
+
+  } catch {
+    console.log("Error getting completed forms")
   }
 }
