@@ -98,11 +98,15 @@ function getForm(id) {
         body: JSON.stringify({ "workOrderNumber": id })
     }).then(response => response.json())
     .then(data => {
+        if(form.children.length > 2) {
+            form.removeChild(form.lastElementChild)
+        }
         if(data) {
             document.getElementById('hiddenForm').hidden = ""
             document.getElementById('address').value = data.address;
             document.getElementById('attendance_num').innerText = data.attendance_num + 1;
         } else {
+            document.getElementById('hiddenForm').hidden = "true"
             let div = document.createElement('p')
             div.innerText = "No form found"
             form.appendChild(div)
@@ -155,12 +159,14 @@ function createEntry() {
     }
 
     const newForm = document.getElementById('newForm')
-    let data = { "workOrderNumber":0, "attendance_num":0, "completed":false, "submitted":false, "address":document.getElementById('address').value, "worker":document.getElementById('assignWorker').value }
+    let data = { "form_type": "", "workOrderNumber":0, "attendance_num":0, "completed":false, "submitted":false, "address":document.getElementById('address').value, "worker":document.getElementById('assignWorker').value }
 
     if(newForm.classList.contains('form1')) {
+        data.form_type = "form1"
         data.workOrderNumber = parseInt(document.getElementById('WON').innerText)
         data.attendance_num = 1
     } else if(newForm.classList.contains('form2')) {
+        data.form_type = "form2"
         data.workOrderNumber = parseInt(document.getElementById('WON').value)
         data.attendance_num = parseInt(document.getElementById("attendance_num").innerText)
     }

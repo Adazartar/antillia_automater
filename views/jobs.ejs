@@ -6,15 +6,24 @@
     <link rel="icon" href="/images/logo.ico" type="image/x-icon">
     <title>Antillia Automater</title>
     <link rel="stylesheet" href="/styles/admin.css">
-    <script type="module" src="/scripts/admin_sidebar.js" defer></script>
+    <link rel="stylesheet" href="/styles/form1.css">
+    <link rel="stylesheet" href="/styles/form2.css">
+    <script type="module" src="/scripts/staff_sidebar.js" defer></script>
     <script type="module" src="/scripts/header.js" defer></script>
+    <script type="module" src="/scripts/jobs.js" defer></script>
 
 </head>
 <body>
     <div class="container">
         <header-component class="header"></header-component>
 
-        <admin_sidebar-component></admin_sidebar-component>
+        <staff_sidebar-component></staff_sidebar-component>
+
+        <div class="main">
+            <div id="form" class="form">
+                <div class="jobs" id="jobs"></div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

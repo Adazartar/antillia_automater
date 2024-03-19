@@ -2,7 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import bodyParser from 'body-parser'
 
-import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm, getSubmittedForms, getCompletedForms } from './database.js'
+import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm, getSubmittedForms, getCompletedForms, getJobs } from './database.js'
 import { createNewFileName, uploadPhoto } from './s3.js'
 
 const app = express()
@@ -45,12 +45,13 @@ app.get('/admin/create_work_order', (req, res) => {
 })
 
 app.post('/admin/create_work_order/new-entry', async (req, res) => {
-    await submit_to_database('forms', {"workOrderNumber": req.body.workOrderNumber,
+    await submit_to_database('forms', {"form_type": req.body.form_type,
+                                        "workOrderNumber": req.body.workOrderNumber,
                                         "completed": req.body.completed,
                                         "submitted": req.body.submitted,
                                         "address": req.body.address,
-                                        "attendance_num": req.body.attendance_num})
-    await submit_to_database('jobs', { "workOrderNumber": req.body.workOrderNumber, "worker": req.body.worker})
+                                        "attendance_num": req.body.attendance_num,
+                                        "staff_ID": parseInt(req.body.worker)})
     res.sendStatus(200)
 })
 
@@ -85,13 +86,26 @@ app.get('/admin/completed_jobs/get_forms', async (req, res) => {
     res.json(forms)
 })
 
-app.get('/admin/create_worker', (req, res) => {
-    res.render("create_worker.ejs")
+app.get('/admin/staff', (req, res) => {
+    res.render("admin_staff.ejs")
 })
 
 app.post('/admin/create_worker_id', async (req, res) => {
     await createWorker(req.body.name)
     res.sendStatus(200)
+})
+
+app.get('/staff', (req, res) => {
+    res.render("staff.ejs")
+})
+
+app.get('/staff/jobs', (req, res) => {
+    res.render("jobs.ejs")
+})
+
+app.post('/staff/jobs/get_jobs', async (req, res) => {
+    const jobs = await getJobs(req.body.user)
+    res.json(jobs)
 })
 
 app.get('/form1', (req, res) => {

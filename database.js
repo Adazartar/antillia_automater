@@ -161,3 +161,28 @@ export async function getCompletedForms() {
     console.log("Error getting completed forms")
   }
 }
+
+export async function getJobs(user) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    var staff_ID = await database.collection("staff").findOne({ "name": user })
+    staff_ID = staff_ID.staffID
+    var jobs = []
+
+    const form = await database.collection("forms").find({"staff_ID":parseInt(staff_ID), "submitted":false}).sort({"attendance_num":-1}).project({"workOrderNumber":1, "attendance_num":1, "address":1, "form_type":1}).toArray()
+    for(var x = 0; x < form.length; x++) {
+      jobs.push(form[x])
+    }
+
+    if(jobs.length > 0) {
+      return jobs
+    } else {
+      return null
+    }
+
+  } catch {
+    console.log(`Error getting jobs for ${user}`)
+  }
+}

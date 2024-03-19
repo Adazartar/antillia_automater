@@ -1,0 +1,112 @@
+#form2 body {
+    font-family: Arial, sans-serif;
+    background-color: #e4f9f5;
+    margin: 0;
+    padding: 20px;
+}
+
+#form2 div {
+    margin-bottom: 15px;
+}
+
+#form2 label {
+    display: block;
+}
+
+#form2 textarea {
+    width: 100%;
+    resize: none;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#form2 input[type="text"],
+select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+#form2 .checkbox-group {
+    margin-bottom: 15px;
+}
+
+#form2 .checkbox-group label {
+    display: block;
+}
+
+#form2 .checkbox-group input[type="checkbox"] {
+    display: inline-block;
+}
+
+#form2 button {
+    padding: 10px;
+    background-color: #32aba9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#form2 button:hover {
+    background-color: #279192;
+}
+
+#form2 #form2 #saveButton {
+    position: fixed;
+    top: 2%;
+    right: 2%;
+    z-index: 999;
+}
+
+#form2 #form {
+    background-color: #ffffff;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#form2 .collapsable-content {
+    display: none
+}
+
+#form2 .checkbox-group {
+    position: relative; /* Add relative positioning to the container */
+}
+
+#form2 .dropdown {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    max-height: 100px;
+    overflow-y: auto;
+    z-index: 999;
+    padding: 5px;
+}
+
+#form2 .checkbox-pair {
+    display: flex;
+}
+
+#form2 .checkbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+#form2 .left {
+    order: 0;
+}
+
+#form2 .right {
+    order: 1;
+}

@@ -63,6 +63,7 @@ body {
     height: 100%;
     padding: 10px;
     background-color: #e4f9f5;
+    overflow: auto;
 }
 
 h1 {
@@ -116,4 +117,19 @@ select {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.job {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: antiquewhite;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 15px;
+}
+
+.job:hover {
+    cursor: pointer;
 }
