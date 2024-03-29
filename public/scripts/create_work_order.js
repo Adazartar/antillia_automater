@@ -159,7 +159,7 @@ function createEntry() {
     }
 
     const newForm = document.getElementById('newForm')
-    let data = { "form_type": "", "workOrderNumber":0, "attendance_num":0, "completed":false, "submitted":false, "address":document.getElementById('address').value, "worker":document.getElementById('assignWorker').value }
+    let data = { "form_type": "", "workOrderNumber":0, "attendance_num":0, "completed":false, "submitted":false, "address":document.getElementById('address').value, "staffID":document.getElementById('assignWorker').value }
 
     if(newForm.classList.contains('form1')) {
         data.form_type = "form1"

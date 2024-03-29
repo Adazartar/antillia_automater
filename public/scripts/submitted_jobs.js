@@ -1,4 +1,4 @@
-const completed = document.getElementById('completed')
+const submitted = document.getElementById('submitted')
 
 function fillList() {
     fetch('/admin/submitted_jobs/get_forms', {
@@ -8,13 +8,14 @@ function fillList() {
         if(data) {
             for(var i = 0; i < data.length; i++) {
                 var list = document.createElement('li')
+                list.classList.add("jobs-list-item")
                 list.innerText = `${data[i].workOrderNumber}: ${data[i].address}` 
-                completed.appendChild(list)
+                submitted.appendChild(list)
             }
         } else {
             var list = document.createElement('p')
             list.innerText = "No Forms available"
-            completed.appendChild(list)
+            submitted.appendChild(list)
         }
     })
 }

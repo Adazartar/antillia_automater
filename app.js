@@ -2,7 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import bodyParser from 'body-parser'
 
-import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm, getSubmittedForms, getCompletedForms, getJobs } from './database.js'
+import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm, getSubmittedForms, getCompletedForms, getJobs, getWorkersAndJobs, deleteWorker, staffStillCurrent, getUnassignedForms } from './database.js'
 import { createNewFileName, uploadPhoto } from './s3.js'
 
 const app = express()
@@ -45,14 +45,19 @@ app.get('/admin/create_work_order', (req, res) => {
 })
 
 app.post('/admin/create_work_order/new-entry', async (req, res) => {
-    await submit_to_database('forms', {"form_type": req.body.form_type,
-                                        "workOrderNumber": req.body.workOrderNumber,
-                                        "completed": req.body.completed,
+    const result = await staffStillCurrent(req.body.staffID)
+    if(result) {
+        await submit_to_database('forms', {"form_type": req.body.form_type,
+                                        "staffID": parseInt(req.body.staffID),
                                         "submitted": req.body.submitted,
-                                        "address": req.body.address,
+                                        "completed": req.body.completed,
+                                        "workOrderNumber": req.body.workOrderNumber,
                                         "attendance_num": req.body.attendance_num,
-                                        "staff_ID": parseInt(req.body.worker)})
-    res.sendStatus(200)
+                                        "address": req.body.address})
+        res.sendStatus(200)
+    } else {
+        res.sendStatus(500)
+    }    
 })
 
 app.post('/admin/get_form', async (req, res) => {
@@ -62,6 +67,15 @@ app.post('/admin/get_form', async (req, res) => {
 
 app.get('/admin/workOrderNumber', async (req, res) => {
     res.json({ 'workOrderNumber': await getNewWorkOrderNumber()})
+})
+
+app.get('/admin/unassigned_jobs', async (req, res) => {
+    res.render("unassigned_jobs.ejs")
+})
+
+app.get('/admin/unassigned_jobs/get_forms', async (req, res) => {
+    const forms = await getUnassignedForms()
+    res.json(forms)
 })
 
 app.get('/admin/submitted_jobs', (req, res) => {
@@ -88,6 +102,17 @@ app.get('/admin/completed_jobs/get_forms', async (req, res) => {
 
 app.get('/admin/staff', (req, res) => {
     res.render("admin_staff.ejs")
+})
+
+app.get('/admin/staff/jobs', async (req, res) => {
+    const info = await getWorkersAndJobs()
+    res.json(info)
+})
+
+app.post('/admin/staff/delete', async (req, res) => {
+
+    await deleteWorker(req.body.id)
+    res.sendStatus(200)
 })
 
 app.post('/admin/create_worker_id', async (req, res) => {

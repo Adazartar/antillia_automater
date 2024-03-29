@@ -133,3 +133,37 @@ select {
 .job:hover {
     cursor: pointer;
 }
+
+.jobs-list {
+    list-style-type: none; 
+    margin: 0;
+    padding: 0;  
+}
+
+.jobs-list-item {
+    text-align: center;
+    margin: 5px;
+    padding: 5px;
+    background-color: antiquewhite;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.staff-job {
+    padding: 5px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+button {
+    padding: 10px;
+    background-color: #32aba9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #279192;
+}

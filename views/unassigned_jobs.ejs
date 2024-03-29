@@ -8,22 +8,21 @@
     <link rel="stylesheet" href="/styles/admin.css">
     <script defer type="module" src="/scripts/admin_sidebar.js"></script>
     <script defer type="module" src="/scripts/header.js"></script>
-    <script defer type="module" src="/scripts/completed_jobs.js"></script>
+    <script defer type="module" src="/scripts/unassigned_jobs.js"></script>
 </head>
 <body>
     <div class="container">
         <header-component class="header"></header-component>
-
+        
         <admin_sidebar-component id="sidebar"></admin_sidebar-component>
 
         <div class="main">
             <div class="form">
-                <ul id="completed" class="jobs-list">
+                <ul id="unassigned" class="jobs-list">
                     
                 </ul>
             </div>
         </div>
     </div>
-
 </body>
 </html>

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/styles/admin.css">
     <script defer type="module" src="/scripts/admin_sidebar.js"></script>
     <script defer type="module" src="/scripts/header.js"></script>
-    <script defer type="module" src="/scripts/create_worker.js"></script>
+    <script defer type="module" src="/scripts/admin_staff.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,10 +16,13 @@
     
         <admin_sidebar-component id="sidebar"></admin_sidebar-component>
 
-        <!-- show all staff starting with the ones that have jobs assigned to them. Add a dropdown to show what jobs they have -->
-
         <div class="main">
-            <div class="form">
+            <div id="first" class="form">
+                <ul id="workers" class="jobs-list">
+
+                </ul>
+            </div>
+            <div id="add-page" class="form" hidden>
                 <div class="input">
                     <label for="workerName">Name:</label>
                     <input type="text" id="workerName">
@@ -28,8 +31,19 @@
                     <button id="createBtn">Create</button>
                 </div>
             </div>
+            <div id="del-page" class="form" hidden>
+                <div class="input">
+                    <label for="staffMembers">Select Staff To Delete:</label>
+                    <select name="staffMembers" id="staffMembers"></select>
+                </div>
+                <div class="input">
+                    <button id="deleteBtn">Delete</button>
+                </div>
+            </div>
+            <button id="list-staff">List Staff</button>
+            <button id="add">Add Staff Member</button>
+            <button id="delete">Delete Staff Member</button>
         </div>
-        
     </div>
 </body>
 </html>

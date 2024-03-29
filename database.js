@@ -25,10 +25,6 @@ export async function submit_to_database(form_name, file) {
     const database = client.db(dbName);
     const collection = database.collection(collectionName);
     const result = collection.insertOne(file);
-    /*
-    await client.db("admin").command({ping: 1})
-    console.log("Pinged")
-    */
   
   } catch {
     console.log("Error uploading to Database")
@@ -65,7 +61,7 @@ export async function getWorkers() {
 
     const database = client.db(dbName)
     const collection = database.collection(collectionName)
-    const result = await collection.find({}, {"name.$":1}).toArray()
+    const result = await collection.find({ is_current: true }, {"name.$":1}).toArray()
   
     if(result.length > 0) {
       return result
@@ -93,7 +89,7 @@ export async function createWorker(name) {
     } else {
       nextID = ID[0].staffID + 1
     }
-    const result = collection.insertOne({ "staffID": nextID, "name": name })
+    const result = collection.insertOne({ "staffID": nextID, "name": name, "is_current": true })
 
   } catch {
     console.log("Error creating new worker")
@@ -171,13 +167,92 @@ export async function getJobs(user) {
     staff_ID = staff_ID.staffID
     var jobs = []
 
-    const form = await database.collection("forms").find({"staff_ID":parseInt(staff_ID), "submitted":false}).sort({"attendance_num":-1}).project({"workOrderNumber":1, "attendance_num":1, "address":1, "form_type":1}).toArray()
+    const form = await database.collection("forms").find({"staffID":parseInt(staff_ID), "submitted":false}).sort({"attendance_num":-1}).project({"workOrderNumber":1, "attendance_num":1, "address":1, "form_type":1}).toArray()
     for(var x = 0; x < form.length; x++) {
       jobs.push(form[x])
     }
 
     if(jobs.length > 0) {
       return jobs
+    } else {
+      return null
+    }
+
+  } catch {
+    console.log(`Error getting jobs for ${user}`)
+  }
+}
+
+export async function getWorkersAndJobs() {
+  var info = {}
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const staff = await database.collection('staff').find({ is_current: true }).toArray()
+    info["staff"] = staff
+
+    if(staff.length == 0) {
+      console.log("Error getting staff members")
+      return null
+    }
+
+    for(var i = 0; i < staff.length; i++) {
+      info[staff[i].staffID] = await database.collection('forms').find({staffID: staff[i].staffID, submitted: false}).toArray()
+    } 
+
+    return info
+  } catch {
+    console.log("Error getting forms")
+  }
+}
+
+export async function deleteWorker(id) {
+  const collectionName = "staff"
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection(collectionName)
+    const staff = await collection.updateOne({ staffID: parseInt(id) }, { $set : { is_current: false }})
+
+  } catch {
+    console.log("Error deleting staff member")
+  }
+} 
+
+export async function staffStillCurrent(id) {
+  const collectionName = "staff"
+
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection(collectionName)
+
+    const result = await collection.find({ staffID: parseInt(id) }).toArray()
+
+    if(result.length > 0) {
+      return true
+    } else {
+      return false
+    }
+  } catch {
+    console.log("Error checking staff member")
+    return false
+  }
+}
+
+export async function getUnassignedForms() {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+
+    const form = await database.collection("forms").find({"staffID":null}).project({"workOrderNumber":1, "attendance_num":1, "address":1, "form_type":1}).toArray()
+
+    if(form.length > 0) {
+      return form
     } else {
       return null
     }

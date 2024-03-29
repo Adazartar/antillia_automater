@@ -1,7 +1,7 @@
-const completed = document.getElementById('completed')
+const unassigned = document.getElementById('unassigned')
 
 function fillList() {
-    fetch('/admin/completed_jobs/get_forms', {
+    fetch('/admin/unassigned_jobs/get_forms', {
         method: 'GET'
     }).then(response => response.json())
     .then(data => {
@@ -10,12 +10,12 @@ function fillList() {
                 var list = document.createElement('li')
                 list.classList.add("jobs-list-item")
                 list.innerText = `${data[i].workOrderNumber}: ${data[i].address}` 
-                completed.appendChild(list)
+                unassigned.appendChild(list)
             }
         } else {
             var list = document.createElement('p')
-            list.innerText = "No Forms available"
-            completed.appendChild(list)
+            list.innerText = "No unassigned forms"
+            unassigned.appendChild(list)
         }
     })
 }
