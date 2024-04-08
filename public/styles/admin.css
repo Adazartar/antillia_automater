@@ -167,3 +167,7 @@ button {
 button:hover {
     background-color: #279192;
 }
+
+.staff-job p:hover {
+    color: steelblue;
+}

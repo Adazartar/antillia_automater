@@ -28,6 +28,7 @@
 #form1 select {
     width: 100%;
     padding: 8px;
+    margin-left: 0;
     box-sizing: border-box;
     margin-top: 5px;
 }
@@ -57,13 +58,6 @@
     background-color: #279192;
 }
 
-#form1 #saveButton {
-    position: fixed;
-    top: 2%;
-    right: 2%;
-    z-index: 999;
-}
-
 #form1 #form {
     background-color: #ffffff;
     max-width: 600px;
@@ -77,15 +71,13 @@
     display: none
 }
 
-
-
 #form1 .checkbox-group {
     position: relative; /* Add relative positioning to the container */
 }
 
 #form1 .dropdown {
     display: none;
-    position: absolute;
+    position: relative;
     background-color: #fff;
     border: 1px solid #ccc;
     max-height: 100px;
@@ -111,4 +103,15 @@
 
 #form1 .right {
     order: 1;
+}
+
+#form1 #formHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#form1 img {
+    display: block;
+    margin: 5px;
 }

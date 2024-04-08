@@ -9,7 +9,7 @@ function fillList() {
             for(var i = 0; i < data.length; i++) {
                 var list = document.createElement('li')
                 list.classList.add("jobs-list-item")
-                list.innerText = `${data[i].workOrderNumber}: ${data[i].address}` 
+                list.innerText = `${data[i].workOrderNumber}: ${data[i].job_address}` 
                 completed.appendChild(list)
             }
         } else {

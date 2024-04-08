@@ -1,22 +1,16 @@
 import express from 'express'
-import multer from 'multer'
 import bodyParser from 'body-parser'
 
-import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, getForm, getSubmittedForms, getCompletedForms, getJobs, getWorkersAndJobs, deleteWorker, staffStillCurrent, getUnassignedForms } from './database.js'
-import { createNewFileName, uploadPhoto } from './s3.js'
+import { submit_to_database, getNewWorkOrderNumber, createWorker, getWorkers, 
+    getForm, getSubmittedForms, getCompletedForms, getJobs, getWorkersAndJobs, 
+    deleteWorker, staffStillCurrent, getUnassignedForms, unassignJob, assignJob,
+    updateForm, submittedForm, getAllFormData } from './database.js'
+import { generateUploadURL } from './s3.js'
 
 const app = express()
 app.use(express.urlencoded({ extended : true }))
 app.use(bodyParser.json());
 app.set('view engine', 'ejs')
-
-const storage = multer.diskStorage({ 
-    destination: "public/uploads",
-    filename: async function(req, file, cb) {
-        cb(null, await createNewFileName())
-    }
-});
-const upload = multer({ storage: storage })
 
 app.use((err, req, res, next) => {
     console.error(err.stack)
@@ -25,11 +19,6 @@ app.use((err, req, res, next) => {
 
 app.get('/', (req, res) => {
     res.render("index.ejs")
-})
-
-app.post('/uploadToNode', upload.single('image'), (req, res) => {
-    //console.log(req.file.filename)
-    res.json({ 'filename': req.file.filename })
 })
 
 app.get('/admin', (req, res) => {
@@ -47,13 +36,14 @@ app.get('/admin/create_work_order', (req, res) => {
 app.post('/admin/create_work_order/new-entry', async (req, res) => {
     const result = await staffStillCurrent(req.body.staffID)
     if(result) {
-        await submit_to_database('forms', {"form_type": req.body.form_type,
-                                        "staffID": parseInt(req.body.staffID),
-                                        "submitted": req.body.submitted,
-                                        "completed": req.body.completed,
-                                        "workOrderNumber": req.body.workOrderNumber,
-                                        "attendance_num": req.body.attendance_num,
-                                        "address": req.body.address})
+        await submit_to_database({"form_type": req.body.form_type,
+                                  "staffID": parseInt(req.body.staffID),
+                                  "submitted": req.body.submitted,
+                                  "completed": req.body.completed,
+                                  "workOrderNumber": req.body.workOrderNumber,
+                                  "attendance_num": req.body.attendance_num,
+                                  "job_address": req.body.job_address,
+                                  "initial": true})
         res.sendStatus(200)
     } else {
         res.sendStatus(500)
@@ -76,6 +66,11 @@ app.get('/admin/unassigned_jobs', async (req, res) => {
 app.get('/admin/unassigned_jobs/get_forms', async (req, res) => {
     const forms = await getUnassignedForms()
     res.json(forms)
+})
+
+app.post('/admin/unassigned_jobs/assign', async (req, res) => {
+    await assignJob(req.body.id, req.body.staffID)
+    res.sendStatus(200)
 })
 
 app.get('/admin/submitted_jobs', (req, res) => {
@@ -110,8 +105,12 @@ app.get('/admin/staff/jobs', async (req, res) => {
 })
 
 app.post('/admin/staff/delete', async (req, res) => {
-
     await deleteWorker(req.body.id)
+    res.sendStatus(200)
+})
+
+app.post('/admin/staff/unassign', async (req, res) => {
+    await unassignJob(req.body.id)
     res.sendStatus(200)
 })
 
@@ -133,50 +132,34 @@ app.post('/staff/jobs/get_jobs', async (req, res) => {
     res.json(jobs)
 })
 
+app.get('/staff/get_photo_url', async (req, res) => {
+    const url = await generateUploadURL()
+    res.json(url)
+})
+
+app.post('/staff/jobs/getForm', async (req, res) => {
+    const result = await getAllFormData(req.body.id)
+
+    res.json(result)
+})
+
+app.post('/staff/jobs/submit', async (req, res) => {
+    await updateForm(req.body)
+
+    res.sendStatus(200)
+})
+
+app.post('/staff/jobs/submitted', async (req, res) => {
+    await submittedForm(req.body.id)
+    res.sendStatus(200)
+})
+
 app.get('/form1', (req, res) => {
     res.render("form1.ejs")
 })
 
-app.post('/form1/submit', async (req, res) => {
-    //Add json to database
-    await submit_to_database('forms', req.body)
-
-    //upload photos to S3
-    for(const photoName of req.body.outside) {
-        await uploadPhoto(photoName)
-    }
-    for(const room of req.body.rooms) {
-        for(const photoName of room.photos) {
-            await uploadPhoto(photoName)
-        }
-    }
-    res.sendStatus(200)
-})
-
 app.get('/form2', (req, res) => {
     res.render("form2.ejs")
-})
-
-app.post('/form2/submit', async (req, res) => {
-    //Add json to database
-    await submit_to_database('forms', req.body)
-
-    //upload photos to S3
-    for(const photoName of req.body.outside) {
-        await uploadPhoto(photoName)
-    }
-    for(const room of req.body.rooms) {
-        for(const photoName of room.photos) {
-            await uploadPhoto(photoName)
-        }
-    }
-    for(const room of req.body.existing_rooms) {
-        for(const photoName of room.photos) {
-            await uploadPhoto(photoName)
-        }
-    }
-    //Return status to allow a redirect to occur on the fetch call
-    res.sendStatus(200)
 })
 
 app.get('/scope', (req, res) => {

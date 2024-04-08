@@ -39,28 +39,48 @@ function createWorker() {
 }
 
 workers.addEventListener("click", function(e) {
-    if (e.target && e.target.matches(".jobs-list-item") && !e.target.classList.contains("empty")) {
-        var jobs = e.target.querySelector(".staff-job")
-        if(jobs.hidden == "") {
-            jobs.hidden = true
-        } else {
-            jobs.hidden = ""
-        }
-        
-    } else if(e.target && e.target.matches(".staff-job") && !e.target.parentNode.classList.contains("empty")) {
-        if(e.target.hidden == "") {
-            e.target.hidden = true
-        } else {
-            e.target.hidden = ""
-        }
-    } else if(e.target && e.target.parentNode.matches(".staff-job") && !e.target.parentNode.parentNode.classList.contains("empty")) {
-        if(e.target.parentNode.hidden == "") {
-            e.target.parentNode.hidden = true
-        } else {
-            e.target.parentNode.hidden = ""
+    if(e.target) {
+        if (e.target.matches(".jobs-list-item") && !e.target.classList.contains("empty")) {
+            var job = e.target.querySelector(".staff-job")
+            if(job.hidden == "") {
+                job.hidden = true
+            } else {
+                job.hidden = ""
+            }
+            
+        } else if(e.target.matches(".staff-job") && !e.target.parentNode.classList.contains("empty")) {
+            if(e.target.hidden == "") {
+                e.target.hidden = true
+            } else {
+                e.target.hidden = ""
+            }
+        } else if(e.target.parentNode.matches(".staff-job") && !e.target.parentNode.parentNode.classList.contains("empty")) {
+            askToUnassign(e.target)
+            /*
+            if(e.target.parentNode.hidden == "") {
+                e.target.parentNode.hidden = true
+            } else {
+                e.target.parentNode.hidden = ""
+            }*/
         }
     }
 })
+
+function askToUnassign(job) {
+    var answer = confirm("Unassign: " + job.innerText)
+    if(answer) {
+        var id = {"id": job.classList[0]}
+        fetch('/admin/staff/unassign', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(id)
+        }).then((res) => {
+            window.location.reload()
+        })
+    }
+}
 
 async function showWorkers() {
     fetch("/admin/staff/jobs", {
@@ -88,10 +108,11 @@ async function showWorkers() {
             var counter = 0
             for(const job of data[data.staff[i].staffID]) {
                 var child = document.createElement('p')
+                child.classList.add(job._id) // *** Keep as position 0 in classlist. Used to unassign job
                 if(counter == 0) {
-                    child.innerText = `${job.workOrderNumber}: ${job.address}`
+                    child.innerText = `${job.workOrderNumber}: ${job.job_address}`
                 } else {
-                    child.innerText = `\n${job.workOrderNumber}: ${job.address}`
+                    child.innerText = `\n${job.workOrderNumber}: ${job.job_address}`
                 }
                 counter++
                 div.appendChild(child)

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 
-import { MongoClient, ServerApiVersion } from 'mongodb';
+import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 
 dotenv.config()
 
@@ -16,21 +16,17 @@ const client = new MongoClient(uri, {
     }
 });
 
-export async function submit_to_database(form_name, file) {
-  const collectionName = form_name;
-
+export async function submit_to_database(file) {
   try {
     await client.connect();
     
     const database = client.db(dbName);
-    const collection = database.collection(collectionName);
+    const collection = database.collection('forms');
     const result = collection.insertOne(file);
   
   } catch {
     console.log("Error uploading to Database")
-    return
   }
-  console.log("Inserted into Database")
 }
 
 export async function getNewWorkOrderNumber() {
@@ -167,7 +163,7 @@ export async function getJobs(user) {
     staff_ID = staff_ID.staffID
     var jobs = []
 
-    const form = await database.collection("forms").find({"staffID":parseInt(staff_ID), "submitted":false}).sort({"attendance_num":-1}).project({"workOrderNumber":1, "attendance_num":1, "address":1, "form_type":1}).toArray()
+    const form = await database.collection("forms").find({"staffID":parseInt(staff_ID), "submitted":false}).sort({"attendance_num":-1}).project({"_id":1, "workOrderNumber":1, "attendance_num":1, "job_address":1, "form_type":1}).toArray()
     for(var x = 0; x < form.length; x++) {
       jobs.push(form[x])
     }
@@ -193,7 +189,6 @@ export async function getWorkersAndJobs() {
     info["staff"] = staff
 
     if(staff.length == 0) {
-      console.log("Error getting staff members")
       return null
     }
 
@@ -249,7 +244,7 @@ export async function getUnassignedForms() {
 
     const database = client.db(dbName)
 
-    const form = await database.collection("forms").find({"staffID":null}).project({"workOrderNumber":1, "attendance_num":1, "address":1, "form_type":1}).toArray()
+    const form = await database.collection("forms").find({"staffID":null}).project({"workOrderNumber":1, "attendance_num":1, "job_address":1, "form_type":1}).toArray()
 
     if(form.length > 0) {
       return form
@@ -259,5 +254,80 @@ export async function getUnassignedForms() {
 
   } catch {
     console.log(`Error getting jobs for ${user}`)
+  }
+}
+
+export async function unassignJob(id) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection("forms")
+
+    await collection.updateOne({ _id:new ObjectId(String(id))}, { $set:{ "staffID":null } })
+
+  } catch {
+    console.log("Could not unassign job")
+  }
+}
+
+export async function assignJob(id, staffID) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection("forms")
+
+    await collection.updateOne({ _id:new ObjectId(String(id)) }, { $set:{ 'staffID':parseInt(staffID) } })
+    console.log("assigned")
+  } catch {
+    console.log("Cannot assign job to worker")
+  }
+}
+
+export async function updateForm(file) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection("forms")
+    
+    var id = file.id
+    delete file.id
+
+    await collection.updateOne({ _id:new ObjectId(String(id))}, { $set: file })
+
+  
+  } catch {
+    console.log("Could not update form")
+  }
+}
+
+export async function submittedForm(id) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection("forms")
+
+    await collection.updateOne({ _id:new ObjectId(String(id))}, { $set:{ "submitted":true } })
+
+  } catch {
+    console.log("Could not submit form")
+  }
+}
+
+export async function getAllFormData(id) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const collection = database.collection("forms")
+
+    const result = await collection.findOne({ _id:new ObjectId(String(id))})
+
+    return result
+  } catch {
+    console.log("Could not get form data")
   }
 }

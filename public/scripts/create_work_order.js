@@ -103,7 +103,7 @@ function getForm(id) {
         }
         if(data) {
             document.getElementById('hiddenForm').hidden = ""
-            document.getElementById('address').value = data.address;
+            document.getElementById('address').value = data.job_address;
             document.getElementById('attendance_num').innerText = data.attendance_num + 1;
         } else {
             document.getElementById('hiddenForm').hidden = "true"
@@ -159,7 +159,7 @@ function createEntry() {
     }
 
     const newForm = document.getElementById('newForm')
-    let data = { "form_type": "", "workOrderNumber":0, "attendance_num":0, "completed":false, "submitted":false, "address":document.getElementById('address').value, "staffID":document.getElementById('assignWorker').value }
+    let data = { "form_type": "", "workOrderNumber":0, "attendance_num":0, "completed":false, "submitted":false, "job_address":document.getElementById('address').value, "staffID":document.getElementById('assignWorker').value }
 
     if(newForm.classList.contains('form1')) {
         data.form_type = "form1"
