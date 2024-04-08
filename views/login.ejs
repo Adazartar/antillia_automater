@@ -6,27 +6,28 @@
     <title>Antillia Automater</title>
     <link rel="stylesheet" href="/styles/admin.css">
     <script defer type="module" src="/scripts/login.js"></script>
+    <script type="module" src="/scripts/header.js" defer></script>
 </head>
-<body>
-    <div class="form">
-        <div class="input">
-            <label for="username">Username:</label>
-            <input type="text" id="username" autocomplete="off">
-        </div>
-        <div class="input">
-            <label for="password">Password:</label>
-            <div class="password">
-                <input type="password" id="password">
-                <input type="checkbox" id="showPassword">
+<body style="height: 100vh;">
+    <header-component class="header"></header-component>
+
+    <div class="main">
+        <div class="form" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);">
+            <div class="input">
+                <label for="username">Username:</label>
+                <input type="text" id="username" autocomplete="off">
+            </div>
+            <div class="input">
+                <label for="password">Password:</label>
+                <div class="password">
+                    <input type="password" id="password">
+                    <input type="checkbox" id="showPassword">
+                </div>
+            </div>
+            <div class="input">
+                <button id="loginBtn">Login</button>
             </div>
         </div>
-        <div class="input">
-            <button id="loginBtn">Login</button>
-        </div>
     </div>
-    <% if (messages.error) { %>
-        <% console.log(messages.error) %>
-        <p>Issue Occured</p>
-    <% } %>
 </body>
 </html>
