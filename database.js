@@ -152,28 +152,22 @@ export async function getCompletedForms() {
   }
 }
 
-export async function getJobs(user) {
+export async function getJobs(staffID) {
   try {
     await client.connect()
 
     const database = client.db(dbName)
-    var staff_ID = await database.collection("staff").findOne({ "name": user })
-    staff_ID = staff_ID.staffID
-    var jobs = []
 
-    const form = await database.collection("forms").find({"staffID":parseInt(staff_ID), "submitted":false}).sort({"attendance_num":-1}).project({"_id":1, "workOrderNumber":1, "attendance_num":1, "job_address":1, "form_type":1}).toArray()
-    for(var x = 0; x < form.length; x++) {
-      jobs.push(form[x])
-    }
+    const form = await database.collection("forms").find({"staffID":parseInt(staffID), "submitted":false}).sort({"attendance_num":-1}).project({"_id":1, "workOrderNumber":1, "attendance_num":1, "job_address":1, "form_type":1}).toArray()
 
-    if(jobs.length > 0) {
-      return jobs
+    if(form.length > 0) {
+      return form
     } else {
       return null
     }
 
   } catch {
-    console.log(`Error getting jobs for ${user}`)
+    console.log(`Error getting jobs`)
   }
 }
 

@@ -18,8 +18,8 @@ export async function saveForm() {
     })
 }
 
-function uploadForm() {
-    saveForm()
+async function uploadForm() {
+    await saveForm()
     //update form so submitted = true
     fetch('/staff/jobs/submitted',{
         method: 'POST',
@@ -861,7 +861,7 @@ async function getDataForm1(){
     return data
 }
 
-export function createForm1(form, id) {
+export async function createForm1(form, id) {
     const div = document.createElement('div')
     div.id = "formContainer"
     div.innerHTML = `
@@ -1062,7 +1062,7 @@ export function createForm1(form, id) {
 
     currentForm = 'form1'
 
-    fillDataForm1(id)
+    await fillDataForm1(id)
 }
 
 async function fillDataForm1(id) {
@@ -1101,10 +1101,11 @@ async function fillDataForm1(id) {
                 // Add a delete button for each photo
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => {
+                deleteButton.addEventListener('click', async () => {
                     // Handle delete functionality here
                     // For now, let's just remove the image from the DOM
                     photoDiv.remove(parsedData.outside[0])
+                    await saveForm()
                     photoElement.remove();
                 });
                 photoElement.appendChild(deleteButton);
@@ -1178,10 +1179,11 @@ async function fillDataForm1(id) {
                     // Add a delete button for each photo
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'Delete';
-                    deleteButton.addEventListener('click', () => {
+                    deleteButton.addEventListener('click', async () => {
                         // Handle delete functionality here
                         // For now, let's just remove the image from the DOM
                         photosDiv.classList.remove(name)
+                        await saveForm()
                         photoElement.remove();
                     });
                     photoElement.appendChild(deleteButton);

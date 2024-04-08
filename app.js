@@ -142,7 +142,7 @@ app.get('/admin/completed_jobs/get_forms', checkAdmin, async (req, res) => {
     res.json(forms)
 })
 
-app.get('/admin/staff', (req, res) => {
+app.get('/admin/staff', checkAdmin, (req, res) => {
     res.render("admin_staff.ejs")
 })
 
@@ -151,7 +151,7 @@ app.get('/admin/staff/jobs', async (req, res) => {
     res.json(info)
 })
 
-app.post('/admin/staff/delete', async (req, res) => {
+app.post('/admin/staff/delete', checkAdmin, async (req, res) => {
     await deleteWorker(req.body.id)
     res.sendStatus(200)
 })
@@ -161,7 +161,7 @@ app.post('/admin/staff/unassign', checkAdmin, async (req, res) => {
     res.sendStatus(200)
 })
 
-app.post('/admin/create_worker_id', async (req, res) => {
+app.post('/admin/create_worker_id', checkAdmin, async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         await createWorker(req.body.name, req.body.username, req.body.admin, hashedPassword)
@@ -179,8 +179,8 @@ app.get('/staff/jobs', checkAuthenticated, (req, res) => {
     res.render("jobs.ejs")
 })
 
-app.post('/staff/jobs/get_jobs', checkAuthenticated, async (req, res) => {
-    const jobs = await getJobs(req.body.user)
+app.get('/staff/jobs/get_jobs', checkAuthenticated, async (req, res) => {
+    const jobs = await getJobs(req.user.staffID)
     res.json(jobs)
 })
 
@@ -191,13 +191,11 @@ app.get('/staff/get_photo_url', checkAuthenticated, async (req, res) => {
 
 app.post('/staff/jobs/getForm', checkAuthenticated, async (req, res) => {
     const result = await getAllFormData(req.body.id)
-
     res.json(result)
 })
 
 app.post('/staff/jobs/submit', checkAuthenticated, async (req, res) => {
     await updateForm(req.body)
-
     res.sendStatus(200)
 })
 

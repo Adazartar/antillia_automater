@@ -14,24 +14,18 @@ async function backToJobs() {
     jobs.hidden = false
 }
 
-function showForm(div) {
+async function showForm(div) {
     jobs.hidden = true
     backBtn.hidden = false
     if(div.classList.contains("form1")) {
-        createForm1(form, div.classList[0])
+        await createForm1(form, div.classList[0])
     } else if(div.classList.contains("form2")) {
         createForm2(form, div.classList[0])
     }
 }
 
 function getJobs() {
-    fetch('/staff/jobs/get_jobs', {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ "user": "Tom" })
-    }).then(response => response.json())
+    fetch('/staff/jobs/get_jobs').then(response => response.json())
     .then(async data => {
         if(!data) {
             let div = document.createElement('p')
@@ -53,8 +47,8 @@ function getJobs() {
             <p>Job Type: ${formName} <br>Address: ${data[i].job_address}</p>
             `
             jobs.appendChild(div)
-            div.onclick = function() {
-                showForm(div)
+            div.onclick = async function() {
+                await showForm(div)
             }
         }
     })
