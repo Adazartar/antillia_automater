@@ -100,6 +100,17 @@ input[type="text"] {
     margin-top: 5px;
 }
 
+.password input[type="password"], .password input[type="text"] {
+    width: 94%;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+.password input[type="checkbox"] {
+    margin: 4px;
+}
+
 #type {
     display: flex;
     justify-content: center;

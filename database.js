@@ -69,14 +69,12 @@ export async function getWorkers() {
   }
 }
 
-export async function createWorker(name) {
-  const collectionName = "staff"
-
+export async function createWorker(name, username, admin, password) {
   try {
     await client.connect()
 
     const database = client.db(dbName)
-    const collection = database.collection(collectionName)
+    const collection = database.collection("staff")
     const ID = await collection.find({}).sort({"staffID": -1}).limit(1).toArray()
 
     let nextID;
@@ -85,7 +83,7 @@ export async function createWorker(name) {
     } else {
       nextID = ID[0].staffID + 1
     }
-    const result = collection.insertOne({ "staffID": nextID, "name": name, "is_current": true })
+    const result = collection.insertOne({ "staffID": nextID, "name": name, "username":username, "password":password, "admin":admin, "is_current": true })
 
   } catch {
     console.log("Error creating new worker")
@@ -329,5 +327,31 @@ export async function getAllFormData(id) {
     return result
   } catch {
     console.log("Could not get form data")
+  }
+}
+
+export async function getUser(username) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const result = await database.collection("staff").findOne({ "username": username })
+
+    return result
+  } catch {
+    console.log("Could not find user with that username")
+  }
+}
+
+export async function getUserByID(staffID) {
+  try {
+    await client.connect()
+
+    const database = client.db(dbName)
+    const result = await database.collection("staff").findOne({ "staffID":staffID })
+
+    return result
+  } catch {
+    console.log("Could not find user with that staffID")
   }
 }

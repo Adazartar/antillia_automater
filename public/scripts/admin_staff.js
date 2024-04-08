@@ -12,6 +12,12 @@ delBtn.addEventListener('click', unhideDelPage)
 
 const createBtn = document.getElementById("createBtn")
 const workerName = document.getElementById("workerName")
+const username = document.getElementById("username")
+const password = document.getElementById("password")
+const showPassword = document.getElementById("showPassword")
+const isAdmin = document.getElementById("admin")
+
+showPassword.addEventListener('click', showPasswordChars)
 
 const select = document.getElementById("staffMembers")
 const deleteBtn = document.getElementById("deleteBtn")
@@ -32,7 +38,7 @@ function createWorker() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name: workerName.value })
+        body: JSON.stringify({ "name":workerName.value, "username":username.value, "admin":isAdmin.checked, "password":password.value })
     }).then((res) => {
         window.location.reload()
     })
@@ -188,4 +194,12 @@ function deleteWorker() {
     }).then((res) => {
         window.location.reload()
     })
+}
+
+function showPasswordChars() {
+    if (password.type === "password") {
+        password.type = "text";
+      } else {
+        password.type = "password";
+      }
 }

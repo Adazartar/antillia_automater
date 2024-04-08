@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antillia Automater</title>
+    <link rel="stylesheet" href="/styles/admin.css">
+    <script defer type="module" src="/scripts/login.js"></script>
+</head>
+<body>
+    <div class="form">
+        <div class="input">
+            <label for="username">Username:</label>
+            <input type="text" id="username" autocomplete="off">
+        </div>
+        <div class="input">
+            <label for="password">Password:</label>
+            <div class="password">
+                <input type="password" id="password">
+                <input type="checkbox" id="showPassword">
+            </div>
+        </div>
+        <div class="input">
+            <button id="loginBtn">Login</button>
+        </div>
+    </div>
+    <% if (messages.error) { %>
+        <% console.log(messages.error) %>
+        <p>Issue Occured</p>
+    <% } %>
+</body>
+</html>
